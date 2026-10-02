@@ -9,7 +9,7 @@ public class PlayerController : NetworkBehaviour
     public float groundCheckDistance = 1;
 
     private Vector2 inputVector;
-    private bool jumpRequest;
+    private bool jumpRequest = false;
 
     private Rigidbody rb;
     private AudioSource audioSource;
@@ -48,18 +48,13 @@ public class PlayerController : NetworkBehaviour
         {
             if (Keyboard.current.aKey.isPressed || Keyboard.current.leftArrowKey.isPressed) h -= 1f;
 
-            if (Keyboard.current.dKey.isPressed ||
-                Keyboard.current.rightArrowKey.isPressed) h += 1f;
-            
+            if (Keyboard.current.dKey.isPressed || Keyboard.current.rightArrowKey.isPressed) h += 1f;
 
             if (Keyboard.current.sKey.isPressed || Keyboard.current.downArrowKey.isPressed) v -= 1f;
-            
 
             if (Keyboard.current.wKey.isPressed || Keyboard.current.upArrowKey.isPressed) v += 1f;
-            
 
             if (Keyboard.current.spaceKey.wasPressedThisFrame) SubmitJumpServerRpc();
-            
         }
 
         Vector2 input = new Vector2(h, v).normalized;
@@ -74,13 +69,18 @@ public class PlayerController : NetworkBehaviour
         Vector3 moveDirection = new Vector3(inputVector.x, 0f, inputVector.y);
 
         Vector3 targetVelocity = moveDirection * speed;
-
+        
         rb.linearVelocity = new Vector3(targetVelocity.x, rb.linearVelocity.y, targetVelocity.z);
 
-        if (jumpRequest)
+        transform.LookAt(transform.position + moveDirection);
+
+        if (moveDirection.sqrMagnitude > 0f)
+            rb.MoveRotation(Quaternion.LookRotation(moveDirection, Vector3.up));
+
+        if (jumpRequest && Physics.Raycast(transform.position, Vector3.down, groundCheckDistance))
         {
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-            audioSource.Play();
+            PlayJumpSoundClientRpc();
         }
 
         jumpRequest = false;
@@ -98,22 +98,10 @@ public class PlayerController : NetworkBehaviour
         jumpRequest = true;
     }
 
-    /*
-    private void OnDrawGizmos()
+    [ClientRpc]
+    private void PlayJumpSoundClientRpc()
     {
-        CapsuleCollider col = GetComponent<CapsuleCollider>();
+        audioSource.Play();
+    }
 
-        if (col == null) return;
-
-        Vector3 rayOrigin = transform.position +
-                            Vector3.down *
-                            (col.height / 2f - col.radius);
-
-        Gizmos.color = Color.red;
-
-        Gizmos.DrawRay(
-            rayOrigin,
-            Vector3.down * groundCheckDistance
-        );
-    }*/
 }

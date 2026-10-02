@@ -126,7 +126,6 @@ GameObject:
   - component: {fileID: 3336507940531772102}
   - component: {fileID: 4208407442412334944}
   - component: {fileID: 4021939240856092932}
-  - component: {fileID: 7791925899054784698}
   - component: {fileID: -6807557860317753640}
   - component: {fileID: -8303882830731543402}
   - component: {fileID: 8969974750030961275}
@@ -217,7 +216,7 @@ CapsuleCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5506188870859976939}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 760862151e45fe740bb59109b94adaf7, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -287,31 +286,6 @@ MonoBehaviour:
   AutoObjectParentSync: 1
   SyncOwnerTransformWhenParented: 1
   AllowOwnerToParent: 0
---- !u!143 &7791925899054784698
-CharacterController:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5506188870859976939}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Height: 2
-  m_Radius: 0.5
-  m_SlopeLimit: 45
-  m_StepOffset: 0.3
-  m_SkinWidth: 0.08
-  m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &-6807557860317753640
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -327,7 +301,7 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   speed: 5
   jumpForce: 5
-  groundCheckDistance: 0.15
+  groundCheckDistance: 1
 --- !u!114 &-8303882830731543402
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -385,8 +359,8 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_Resource: {fileID: 8300000, guid: 84c5e39f3e5f5714a804d6ccfb9da706, type: 3}
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
