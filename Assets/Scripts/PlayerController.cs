@@ -15,9 +15,14 @@ public class PlayerController : NetworkBehaviour
     private Rigidbody rb;
     private AudioSource audioSource;
 
+    private Vector3 bumpVelocity;
+
     private NetworkVariable<Color> playerColor = new NetworkVariable<Color>();
     private NetworkVariable<FixedString32Bytes> playerName = new NetworkVariable<FixedString32Bytes>();
     private Renderer playerRenderer;
+
+    [SerializeField] private GameObject bulletPrefab;
+    [SerializeField] private float bulletSpeed = 10f;
 
     private void Awake()
     {
@@ -78,6 +83,11 @@ public class PlayerController : NetworkBehaviour
                 ChangeColorServerRpc();
         }
 
+        if (Keyboard.current.fKey.wasPressedThisFrame)
+        {
+            ShootServerRpc();
+        }
+
         Vector2 input = new Vector2(h, v).normalized;
 
         SubmitInputServerRpc(input);
@@ -92,9 +102,15 @@ public class PlayerController : NetworkBehaviour
         Vector3 targetVelocity = moveDirection * speed;
 
         rb.linearVelocity = new Vector3(
-            targetVelocity.x,
+            targetVelocity.x + bumpVelocity.x,
             rb.linearVelocity.y,
-            targetVelocity.z
+            targetVelocity.z + bumpVelocity.z
+        );
+
+        bumpVelocity = Vector3.Lerp(
+            bumpVelocity,
+            Vector3.zero,
+            5f * Time.fixedDeltaTime
         );
 
         transform.LookAt(transform.position + moveDirection);
@@ -111,6 +127,34 @@ public class PlayerController : NetworkBehaviour
 
         jumpRequest = false;
     }
+    [ServerRpc]
+    private void ShootServerRpc()
+    {
+        Vector3 spawnPosition = transform.position + transform.forward;
+        Quaternion spawnRotation = transform.rotation;
+
+        GameObject bullet = Instantiate(
+            bulletPrefab,
+            spawnPosition,
+            spawnRotation
+        );
+
+        bullet.GetComponent<NetworkObject>().Spawn();
+
+        Rigidbody bulletRb = bullet.GetComponent<Rigidbody>();
+
+        if (bulletRb != null)
+        {
+            bulletRb.linearVelocity = transform.forward * bulletSpeed;
+        }
+    }
+
+    public void Bump(Vector3 force)
+    {
+        if (!IsServer) return;
+
+        bumpVelocity = force;
+    }
 
     private void ApplyColor(Color color)
     {
@@ -121,6 +165,7 @@ public class PlayerController : NetworkBehaviour
     {
         ApplyColor(newColor);
     }
+
     private void OnNameChanged(FixedString32Bytes oldName, FixedString32Bytes newName)
     {
         Debug.Log("Nombre del jugador: " + newName);
@@ -150,4 +195,3 @@ public class PlayerController : NetworkBehaviour
         playerColor.Value = Random.ColorHSV();
     }
 }
-
